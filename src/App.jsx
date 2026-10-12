@@ -9,8 +9,7 @@ import { QuizPage } from './components/quiz/QuizPage';
 import { ProgressPage } from './components/progress/ProgressPage';
 import { SignDetailModal } from './components/common/SignDetailModal';
 import { AuthModal } from './components/auth/AuthModal';
-import { AuthProvider } from './context/AuthContext';
-import { signService } from './services/signService';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import './styles/App.css';
 
 function AuthNotificationBanner({ onOpenAuth }) {
