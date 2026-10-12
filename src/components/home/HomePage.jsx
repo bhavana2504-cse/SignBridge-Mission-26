@@ -89,7 +89,7 @@ export function HomePage({ setActiveTab, onSelectSign, onStartPractice }) {
               </div>
             </div>
 
-            {/* Right Column: Female ISL Instructor Character Illustration */}
+            {/* Right Column: SignBridge Penguin Mascot Illustration */}
             <div style={{ position: 'relative' }}>
               <InstructorHeroIllustration />
             </div>
