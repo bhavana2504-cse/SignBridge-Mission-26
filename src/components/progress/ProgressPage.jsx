@@ -19,6 +19,7 @@ import { SignCard } from '../common/SignCard';
 import { signService } from '../../services/signService';
 import { storageService } from '../../services/storageService';
 import { futureDatasetService } from '../../services/futureDatasetService';
+import { useAuth } from '../../context/AuthContext';
 
 const PREDEFINED_AVATARS = [
   { id: 'avatar_sage', label: '🌿 Sage', bg: '#4f46e5' },
@@ -28,7 +29,8 @@ const PREDEFINED_AVATARS = [
   { id: 'avatar_emerald', label: '🍃 Emerald', bg: '#10b981' }
 ];
 
-export function ProgressPage({ onSelectSign, onStartPractice, setActiveTab }) {
+export function ProgressPage({ onSelectSign, onStartPractice, setActiveTab, onOpenAuth }) {
+  const { user } = useAuth();
   const [completedList, setCompletedList] = useState([]);
   const [favoritesList, setFavoritesList] = useState([]);
   const [recentlyViewedList, setRecentlyViewedList] = useState([]);
@@ -116,6 +118,46 @@ export function ProgressPage({ onSelectSign, onStartPractice, setActiveTab }) {
         <p className="section-subtitle">
           Track your completed signs, streak metrics, earned coins, and achievement badges saved locally.
         </p>
+      </div>
+
+      {/* Supabase Cloud Sync Status Banner */}
+      <div style={{
+        backgroundColor: user ? '#ecfdf5' : '#f8faff',
+        border: `1px solid ${user ? '#a7f3d0' : 'var(--color-primary-200)'}`,
+        borderRadius: 'var(--radius-lg)',
+        padding: '1rem 1.25rem',
+        marginBottom: '1.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '0.75rem'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <span style={{ fontSize: '1.4rem' }}>{user ? '☁️' : '💾'}</span>
+          <div>
+            <strong style={{ fontSize: '0.95rem', color: user ? '#065f46' : 'var(--color-primary-900)', display: 'block' }}>
+              {user ? 'Supabase Cloud Sync: Active' : 'Local Offline Mode Active'}
+            </strong>
+            <span style={{ fontSize: '0.825rem', color: user ? '#047857' : 'var(--text-muted)' }}>
+              {user 
+                ? `Authenticated as ${user.email}. Progress automatically synced with Row Level Security.`
+                : 'Your progress is stored in this browser. Sign in to sync across devices.'
+              }
+            </span>
+          </div>
+        </div>
+
+        {!user && onOpenAuth && (
+          <button
+            type="button"
+            className="btn-primary btn-sm"
+            style={{ fontSize: '0.85rem', padding: '0.45rem 1rem' }}
+            onClick={onOpenAuth}
+          >
+            <span>Sign In to Sync</span>
+          </button>
+        )}
       </div>
 
       {/* User Learner Profile Card */}

@@ -8,18 +8,22 @@ import {
   Menu, 
   X, 
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  User
 } from './Icons';
 import { BridgeLogo } from './Illustrations';
 import { storageService } from '../../services/storageService';
 import { signService } from '../../services/signService';
+import { useAuth } from '../../context/AuthContext';
 
-export function Header({ activeTab, setActiveTab }) {
+export function Header({ activeTab, setActiveTab, onOpenAuth }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
   const [quizAttempts, setQuizAttempts] = useState(0);
   const [userProfile, setUserProfile] = useState({ name: 'Sign Learner', avatar: 'avatar_sage' });
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
 
+  const { user, signOut } = useAuth();
   const totalSigns = signService.getAllSigns().length;
 
   const updateStats = () => {
@@ -50,6 +54,7 @@ export function Header({ activeTab, setActiveTab }) {
   const handleNavClick = (tabId) => {
     setActiveTab(tabId);
     setIsMobileMenuOpen(false);
+    setShowUserDropdown(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -57,6 +62,9 @@ export function Header({ activeTab, setActiveTab }) {
   const coins = 120 + (completedCount * 10) + (quizAttempts * 15);
   // Dynamic streak (default 5 days as displayed in reference)
   const streakDays = Math.max(5, Math.min(30, 5 + Math.floor(completedCount / 3)));
+
+  // Display user name
+  const displayName = user?.user_metadata?.full_name || userProfile.name || (user?.email ? user.email.split('@')[0] : 'Sign Learner');
 
   return (
     <header className="site-header" role="banner">
@@ -94,7 +102,7 @@ export function Header({ activeTab, setActiveTab }) {
             })}
           </nav>
 
-          {/* Header Right Status Badges: Streak, Coins, Profile */}
+          {/* Header Right Status Badges: Streak, Coins, Auth/Profile */}
           <div className="header-right">
             {/* Streak Badge */}
             <div className="pill-status-badge streak" title={`${streakDays} days active learning streak`}>
@@ -108,16 +116,78 @@ export function Header({ activeTab, setActiveTab }) {
               <span>{coins} Coins</span>
             </div>
 
-            {/* Profile Avatar */}
-            <button 
-              type="button"
-              className="avatar-nav-circle"
-              onClick={() => handleNavClick('progress')}
-              title={`View ${userProfile.name}'s Progress`}
-              aria-label="User Profile"
-            >
-              <span>👩‍🎓</span>
-            </button>
+            {/* Profile Avatar / Auth Status */}
+            {user ? (
+              <div style={{ position: 'relative' }}>
+                <button 
+                  type="button"
+                  className="avatar-nav-circle"
+                  onClick={() => setShowUserDropdown(!showUserDropdown)}
+                  title={`${displayName} - Click for Account`}
+                  aria-label="User Account Options"
+                  aria-expanded={showUserDropdown}
+                >
+                  <span>👩‍🎓</span>
+                </button>
+
+                {showUserDropdown && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '115%',
+                    right: 0,
+                    width: '210px',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-md)',
+                    padding: '0.85rem',
+                    zIndex: 100,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.5rem'
+                  }}>
+                    <div style={{ paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-light)' }}>
+                      <strong style={{ fontSize: '0.85rem', display: 'block', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {displayName}
+                      </strong>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        {user.email}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="footer-btn-link"
+                      style={{ fontSize: '0.85rem', textAlign: 'left', padding: '0.35rem 0' }}
+                      onClick={() => handleNavClick('progress')}
+                    >
+                      📊 View Cloud Progress
+                    </button>
+
+                    <button
+                      type="button"
+                      className="footer-btn-link"
+                      style={{ fontSize: '0.85rem', textAlign: 'left', padding: '0.35rem 0', color: '#ef4444', fontWeight: '700' }}
+                      onClick={async () => {
+                        await signOut();
+                        setShowUserDropdown(false);
+                      }}
+                    >
+                      🚪 Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="btn-primary btn-sm"
+                style={{ padding: '0.4rem 0.9rem', fontSize: '0.85rem' }}
+                onClick={onOpenAuth}
+              >
+                <span>Sign In</span>
+              </button>
+            )}
 
             {/* Mobile Hamburger Button */}
             <button
@@ -144,8 +214,40 @@ export function Header({ activeTab, setActiveTab }) {
               <span>{item.label}</span>
             </button>
           ))}
+          <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-light)' }}>
+            {user ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>Signed in as {displayName}</span>
+                <button
+                  type="button"
+                  className="btn-secondary btn-sm"
+                  style={{ color: '#ef4444' }}
+                  onClick={async () => {
+                    await signOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="btn-primary btn-sm"
+                style={{ width: '100%', justifyContent: 'center' }}
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  if (onOpenAuth) onOpenAuth();
+                }}
+              >
+                Sign In / Register
+              </button>
+            )}
+          </div>
         </div>
       )}
     </header>
   );
 }
+
+export default Header;

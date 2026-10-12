@@ -1,8 +1,10 @@
 /**
- * SignBridge Local Storage Service
+ * SignBridge Local & Cloud Storage Service
  * Handles persistence for user progress, favorites, recent views, and quiz scores.
- * Emits custom events on changes so all UI components remain seamlessly synced.
+ * Seamlessly integrates local offline storage with Supabase cloud database synchronization.
  */
+
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 const STORAGE_KEYS = {
   COMPLETED_LESSONS: 'signbridge_completed_lessons_v1',
@@ -64,13 +66,16 @@ export const storageService = {
       updated = [...list, signId];
     }
     safeSet(STORAGE_KEYS.COMPLETED_LESSONS, updated);
+    this.pushCloudUpdate({ completed_lessons: updated });
     return updated.includes(signId);
   },
 
   markLessonCompleted(signId) {
     const list = this.getCompletedLessons();
     if (!list.includes(signId)) {
-      safeSet(STORAGE_KEYS.COMPLETED_LESSONS, [...list, signId]);
+      const updated = [...list, signId];
+      safeSet(STORAGE_KEYS.COMPLETED_LESSONS, updated);
+      this.pushCloudUpdate({ completed_lessons: updated });
     }
   },
 
@@ -94,6 +99,7 @@ export const storageService = {
       updated = [...list, signId];
     }
     safeSet(STORAGE_KEYS.FAVORITES, updated);
+    this.pushCloudUpdate({ favorites: updated });
     return updated.includes(signId);
   },
 
@@ -105,7 +111,6 @@ export const storageService = {
   addRecentlyViewed(signId) {
     if (!signId) return;
     const current = this.getRecentlyViewed();
-    // Remove if already present, put at start, cap at 12 items
     const filtered = current.filter((id) => id !== signId);
     const updated = [signId, ...filtered].slice(0, 12);
     safeSet(STORAGE_KEYS.RECENTLY_VIEWED, updated);
@@ -126,8 +131,9 @@ export const storageService = {
       total: result.total,
       percentage: Math.round((result.score / result.total) * 100)
     };
-    const updated = [record, ...history].slice(0, 30); // keep last 30 quizzes
+    const updated = [record, ...history].slice(0, 30);
     safeSet(STORAGE_KEYS.QUIZ_HISTORY, updated);
+    this.pushCloudUpdate({ quiz_attempts: updated.length });
     return record;
   },
 
@@ -144,6 +150,10 @@ export const storageService = {
     const current = this.getUserProfile();
     const updated = { ...current, ...updates };
     safeSet(STORAGE_KEYS.USER_PROFILE, updated);
+    this.pushCloudUpdate({ 
+      display_name: updated.name, 
+      avatar: updated.avatar 
+    });
     return updated;
   },
 
@@ -160,5 +170,100 @@ export const storageService = {
       console.error('Error resetting progress:', err);
       return false;
     }
+  },
+
+  // --- Supabase Cloud Sync & Merge Logic ---
+  async syncWithSupabase(user) {
+    if (!supabase || !isSupabaseConfigured() || !user) return;
+
+    try {
+      // 1. Fetch cloud record for current authenticated user
+      const { data: cloudData, error } = await supabase
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const localCompleted = this.getCompletedLessons();
+      const localFavorites = this.getFavorites();
+      const localProfile = this.getUserProfile();
+      const localQuizzes = this.getQuizHistory();
+
+      // If user row does not exist yet in public.user_progress, insert it
+      if (!cloudData) {
+        const initialRecord = {
+          user_id: user.id,
+          display_name: localProfile.name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Sign Learner',
+          avatar: localProfile.avatar || 'avatar_sage',
+          completed_lessons: localCompleted,
+          favorites: localFavorites,
+          coins: 120 + (localCompleted.length * 10) + (localQuizzes.length * 15),
+          streak: Math.max(1, Math.min(30, 5 + Math.floor(localCompleted.length / 3))),
+          longest_streak: Math.max(1, Math.min(30, 5 + Math.floor(localCompleted.length / 3))),
+          quiz_attempts: localQuizzes.length,
+          last_activity_date: new Date().toISOString().split('T')[0],
+          updated_at: new Date().toISOString()
+        };
+
+        const { error: insertErr } = await supabase.from('user_progress').insert(initialRecord);
+        if (insertErr) {
+          console.warn('[SignBridge] Supabase initial progress insert notice:', insertErr.message);
+        }
+        return;
+      }
+
+      // Merge arrays safely (no duplicates)
+      const mergedCompleted = Array.from(new Set([...(cloudData.completed_lessons || []), ...localCompleted]));
+      const mergedFavorites = Array.from(new Set([...(cloudData.favorites || []), ...localFavorites]));
+      const mergedName = cloudData.display_name || localProfile.name || 'Sign Learner';
+      const mergedAvatar = cloudData.avatar || localProfile.avatar || 'avatar_sage';
+
+      // Update local storage with merged state
+      safeSet(STORAGE_KEYS.COMPLETED_LESSONS, mergedCompleted);
+      safeSet(STORAGE_KEYS.FAVORITES, mergedFavorites);
+      safeSet(STORAGE_KEYS.USER_PROFILE, {
+        ...localProfile,
+        name: mergedName,
+        avatar: mergedAvatar
+      });
+
+      // Update Supabase with merged values
+      await supabase
+        .from('user_progress')
+        .update({
+          completed_lessons: mergedCompleted,
+          favorites: mergedFavorites,
+          display_name: mergedName,
+          avatar: mergedAvatar,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
+
+      notifyChange();
+    } catch (syncErr) {
+      console.warn('[SignBridge] Supabase sync fallback to offline local storage:', syncErr);
+    }
+  },
+
+  // Helper to push non-blocking updates to cloud if logged in
+  async pushCloudUpdate(fields) {
+    if (!supabase || !isSupabaseConfigured()) return;
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      await supabase
+        .from('user_progress')
+        .update({
+          ...fields,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
+    } catch (err) {
+      // Graceful offline fallback
+    }
   }
 };
+
+export default storageService;

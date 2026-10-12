@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 import { VideoPlayer } from './VideoPlayer';
-import { Heart, CheckCircle2, Video, Sparkles } from './Icons';
+import { Heart, CheckCircle2, Video, Sparkles, AlertCircle } from './Icons';
 import { storageService } from '../../services/storageService';
+import { aiService } from '../../services/aiService';
 
 export function SignDetailModal({ sign, isOpen, onClose, onStartPractice }) {
   if (!sign) return null;
@@ -10,12 +11,20 @@ export function SignDetailModal({ sign, isOpen, onClose, onStartPractice }) {
   const [isFav, setIsFav] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
+  // Gemini AI state
+  const [aiExplanation, setAiExplanation] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState(null);
+
   useEffect(() => {
     if (sign && isOpen) {
       setIsFav(storageService.isFavorite(sign.id));
       setIsCompleted(storageService.isLessonCompleted(sign.id));
       // Track as recently viewed
       storageService.addRecentlyViewed(sign.id);
+      // Reset AI explanation on new sign
+      setAiExplanation(null);
+      setAiError(null);
     }
   }, [sign, isOpen]);
 
@@ -33,6 +42,20 @@ export function SignDetailModal({ sign, isOpen, onClose, onStartPractice }) {
     onClose();
     if (onStartPractice) {
       onStartPractice(sign.id);
+    }
+  };
+
+  const handleAskGemini = async () => {
+    setAiLoading(true);
+    setAiError(null);
+
+    const res = await aiService.explainSign(sign.word, sign.category);
+    setAiLoading(false);
+
+    if (res.success) {
+      setAiExplanation(res.text);
+    } else {
+      setAiError(res.error);
     }
   };
 
@@ -98,8 +121,48 @@ export function SignDetailModal({ sign, isOpen, onClose, onStartPractice }) {
         </div>
       )}
 
+      {/* Gemini AI Educational Coach Card */}
+      <div style={{ backgroundColor: 'var(--bg-subtle)', border: '1px solid var(--color-primary-200)', borderRadius: 'var(--radius-lg)', padding: '1rem', marginTop: '0.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Sparkles size={18} color="var(--color-primary-700)" />
+            <strong style={{ fontSize: '0.9rem', color: 'var(--color-primary-900)' }}>Gemini AI Sign Coach</strong>
+          </div>
+          {!aiExplanation && (
+            <button
+              type="button"
+              className="btn-secondary btn-sm"
+              style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
+              onClick={handleAskGemini}
+              disabled={aiLoading}
+            >
+              {aiLoading ? 'Analyzing...' : 'Ask AI Coach'}
+            </button>
+          )}
+        </div>
+
+        {aiLoading && (
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem', fontStyle: 'italic' }}>
+            Consulting Gemini for handshape breakdown and memory tips...
+          </p>
+        )}
+
+        {aiError && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem', color: '#b91c1c', fontSize: '0.8rem' }}>
+            <AlertCircle size={15} />
+            <span>{aiError}</span>
+          </div>
+        )}
+
+        {aiExplanation && (
+          <div style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: 'var(--text-body)', lineHeight: '1.55', whiteSpace: 'pre-line', borderTop: '1px dashed var(--border-light)', paddingTop: '0.65rem' }}>
+            {aiExplanation}
+          </div>
+        )}
+      </div>
+
       {/* Bottom CTA to practice with webcam */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
         <button
           type="button"
           className={`btn-secondary btn-sm ${isCompleted ? 'btn-outline-green' : ''}`}
@@ -121,3 +184,5 @@ export function SignDetailModal({ sign, isOpen, onClose, onStartPractice }) {
     </Modal>
   );
 }
+
+export default SignDetailModal;
