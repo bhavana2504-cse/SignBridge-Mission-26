@@ -7,11 +7,14 @@ const AuthContext = createContext({
   session: null,
   loading: true,
   error: null,
+  authNotice: null,
   signUp: async () => {},
   signIn: async () => {},
   signOut: async () => {},
   resetPassword: async () => {},
-  clearError: () => {}
+  resendConfirmationEmail: async () => {},
+  clearError: () => {},
+  clearAuthNotice: () => {}
 });
 
 export function AuthProvider({ children }) {
@@ -19,10 +22,62 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [authNotice, setAuthNotice] = useState(null);
 
   const clearError = () => setError(null);
+  const clearAuthNotice = () => setAuthNotice(null);
 
   useEffect(() => {
+    // 0. Parse URL fragment/search for auth callbacks, confirmation tokens, or errors
+    const checkUrlAuthParams = () => {
+      try {
+        const hash = window.location.hash ? window.location.hash.substring(1) : '';
+        const search = window.location.search ? window.location.search.substring(1) : '';
+        const combined = hash.includes('=') ? hash : search;
+        if (!combined) return;
+
+        const params = new URLSearchParams(combined);
+        const errorParam = params.get('error');
+        const errorCode = params.get('error_code');
+        const errorDescription = params.get('error_description');
+        const type = params.get('type');
+        const accessToken = params.get('access_token');
+
+        if (errorParam || errorCode) {
+          let message = errorDescription ? decodeURIComponent(errorDescription.replace(/\+/g, ' ')) : 'Email verification failed.';
+          if (errorCode === 'otp_expired' || message.toLowerCase().includes('expired')) {
+            message = 'Your confirmation link has expired or has already been used. Please request a new confirmation email below.';
+          } else if (errorParam === 'access_denied') {
+            message = 'Access denied or invalid verification link. Please request a new confirmation email below.';
+          }
+          setAuthNotice({
+            type: 'error',
+            title: 'Verification Link Expired or Invalid',
+            message
+          });
+          // Clean URL parameters to avoid re-triggering
+          window.history.replaceState(null, '', window.location.pathname);
+        } else if (type === 'signup' || (accessToken && type !== 'recovery')) {
+          setAuthNotice({
+            type: 'success',
+            title: 'Email Verified Successfully!',
+            message: 'Your email address has been confirmed. You are now signed in to SignBridge.'
+          });
+          window.history.replaceState(null, '', window.location.pathname);
+        } else if (type === 'recovery') {
+          setAuthNotice({
+            type: 'info',
+            title: 'Password Reset',
+            message: 'You have been authenticated via recovery link. You may now update your password.'
+          });
+        }
+      } catch (e) {
+        console.warn('[SignBridge Auth] URL auth parsing notice:', e);
+      }
+    };
+
+    checkUrlAuthParams();
+
     if (!supabase || !isSupabaseConfigured()) {
       setLoading(false);
       return;
@@ -70,6 +125,7 @@ export function AuthProvider({ children }) {
       email,
       password,
       options: {
+        emailRedirectTo: window.location.origin,
         data: {
           full_name: fullName || email.split('@')[0]
         }
@@ -77,7 +133,11 @@ export function AuthProvider({ children }) {
     });
 
     if (signUpError) {
-      setError(signUpError.message);
+      if (signUpError.message?.toLowerCase().includes('already registered')) {
+        setError('An account with this email already exists. Please sign in or reset your password.');
+      } else {
+        setError(signUpError.message);
+      }
       throw signUpError;
     }
 
@@ -154,16 +214,46 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  // Resend confirmation email
+  const resendConfirmationEmail = async (email) => {
+    clearError();
+    if (!supabase || !isSupabaseConfigured()) {
+      throw new Error('Supabase is not configured. Check environment variables.');
+    }
+
+    if (!email || !email.includes('@')) {
+      throw new Error('Please enter a valid email address.');
+    }
+
+    const { data, error: resendErr } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: window.location.origin
+      }
+    });
+
+    if (resendErr) {
+      setError(resendErr.message);
+      throw resendErr;
+    }
+
+    return data;
+  };
+
   const value = {
     user,
     session,
     loading,
     error,
+    authNotice,
     signUp,
     signIn,
     signOut,
     resetPassword,
+    resendConfirmationEmail,
     clearError,
+    clearAuthNotice,
     isConfigured: isSupabaseConfigured()
   };
 

@@ -6,11 +6,11 @@
 -- 2. Go to "SQL Editor" on the left menu.
 -- 3. Click "New Query", paste the content below, and click "Run".
 -- 
--- Note: This migration strictly preserves your existing tables ('users', 'sign-bridge')
--- and adds a secure, RLS-protected 'user_progress' table linked to auth.users.
+-- Note: Preserves your existing tables ('users', 'sign-bridge') without data loss.
+-- Implements authentic starting coins (100), activity streak, and idempotent rewards.
 -- ==============================================================================
 
--- 1. Create 'user_progress' table tied to Supabase Auth
+-- 1. Create or update 'user_progress' table tied to Supabase Auth
 create table if not exists public.user_progress (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade unique not null,
@@ -18,14 +18,20 @@ create table if not exists public.user_progress (
   avatar text default 'avatar_sage',
   completed_lessons text[] default '{}',
   favorites text[] default '{}',
-  coins integer default 120 check (coins >= 0),
-  streak integer default 1 check (streak >= 0),
-  longest_streak integer default 1 check (longest_streak >= 0),
-  last_activity_date date default current_date,
+  coins integer default 100 check (coins >= 0),
+  streak integer default 0 check (streak >= 0),
+  longest_streak integer default 0 check (longest_streak >= 0),
+  last_activity_date date default null,
   quiz_attempts integer default 0 check (quiz_attempts >= 0),
+  rewarded_activities text[] default '{}',
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
+
+-- Ensure columns exist if table was already created earlier
+alter table public.user_progress add column if not exists rewarded_activities text[] default '{}';
+alter table public.user_progress add column if not exists longest_streak integer default 0;
+alter table public.user_progress add column if not exists last_activity_date date default null;
 
 -- 2. Enable Row Level Security (RLS)
 alter table public.user_progress enable row level security;
@@ -53,18 +59,27 @@ create policy "Users can update own progress"
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
--- 4. Trigger to automatically create a user_progress record when a user signs up
+-- 4. Trigger to automatically create a user_progress record when a user signs up (100 coins, 0 streak)
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.user_progress (user_id, display_name, avatar, coins, streak, longest_streak)
+  insert into public.user_progress (
+    user_id, 
+    display_name, 
+    avatar, 
+    coins, 
+    streak, 
+    longest_streak,
+    rewarded_activities
+  )
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
     'avatar_sage',
-    120,
-    1,
-    1
+    100,
+    0,
+    0,
+    '{"welcome_bonus"}'
   )
   on conflict (user_id) do nothing;
   return new;

@@ -25,9 +25,14 @@ export function HomePage({ setActiveTab, onSelectSign, onStartPractice }) {
   const featuredSigns = signService.getFeaturedSigns();
   const helloSign = signService.getSignById('hello');
 
+  const [coins, setCoins] = useState(() => storageService.getCoins());
+  const [streakDays, setStreakDays] = useState(() => storageService.getDisplayStreak());
+
   const updateProgress = () => {
     setCompletedCount(storageService.getCompletedLessons().length);
     setQuizAttempts(storageService.getQuizHistory().length);
+    setCoins(storageService.getCoins());
+    setStreakDays(storageService.getDisplayStreak());
   };
 
   useEffect(() => {
@@ -39,8 +44,6 @@ export function HomePage({ setActiveTab, onSelectSign, onStartPractice }) {
   }, []);
 
   const progressPercentage = Math.round((completedCount / totalSigns) * 100) || 0;
-  const coins = 120 + (completedCount * 10) + (quizAttempts * 15);
-  const streakDays = Math.max(5, Math.min(30, 5 + Math.floor(completedCount / 3)));
   const dailyGoalTarget = 5;
   const dailyGoalDone = Math.min(dailyGoalTarget, completedCount % 5 || (completedCount > 0 ? 5 : 2));
   const dailyGoalPct = Math.round((dailyGoalDone / dailyGoalTarget) * 100);

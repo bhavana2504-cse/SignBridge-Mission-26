@@ -41,6 +41,10 @@ export function ProgressPage({ onSelectSign, onStartPractice, setActiveTab, onOp
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [datasetAuditResult, setDatasetAuditResult] = useState(null);
 
+  const [coins, setCoins] = useState(() => storageService.getCoins());
+  const [streakDays, setStreakDays] = useState(() => storageService.getDisplayStreak());
+  const [longestStreak, setLongestStreak] = useState(() => storageService.getLongestStreak());
+
   const allSigns = signService.getAllSigns();
   const categories = signService.getCategories();
 
@@ -49,6 +53,9 @@ export function ProgressPage({ onSelectSign, onStartPractice, setActiveTab, onOp
     setFavoritesList(storageService.getFavorites());
     setRecentlyViewedList(storageService.getRecentlyViewed());
     setQuizHistory(storageService.getQuizHistory());
+    setCoins(storageService.getCoins());
+    setStreakDays(storageService.getDisplayStreak());
+    setLongestStreak(storageService.getLongestStreak());
     const profile = storageService.getUserProfile();
     setUserProfile(profile);
     setNameInput(profile.name || 'Sign Learner');
@@ -98,8 +105,6 @@ export function ProgressPage({ onSelectSign, onStartPractice, setActiveTab, onOp
 
   const overallPercent = Math.round((completedList.length / allSigns.length) * 100) || 0;
   const currentAvatar = PREDEFINED_AVATARS.find((a) => a.id === userProfile.avatar) || PREDEFINED_AVATARS[0];
-  const coins = 120 + (completedList.length * 10) + (quizHistory.length * 15);
-  const streakDays = Math.max(5, Math.min(30, 5 + Math.floor(completedList.length / 3)));
 
   // Badges unlock criteria
   const hasFirstSign = completedList.length >= 1;
@@ -252,10 +257,10 @@ export function ProgressPage({ onSelectSign, onStartPractice, setActiveTab, onOp
           <div className="sign-card">
             <span className="stat-label">Learning Streak</span>
             <span className="stat-val" style={{ color: '#ea580c' }}>
-              🔥 {streakDays} Days
+              🔥 {streakDays} {streakDays === 1 ? 'Day' : 'Days'}
             </span>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
-              Consistent daily signing
+              {streakDays > 0 ? `Active streak • Best: ${longestStreak}d` : `Inactive • Best: ${longestStreak}d`}
             </span>
           </div>
 

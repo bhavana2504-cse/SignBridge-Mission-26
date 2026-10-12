@@ -13,6 +13,62 @@ import { AuthProvider } from './context/AuthContext';
 import { signService } from './services/signService';
 import './styles/App.css';
 
+function AuthNotificationBanner({ onOpenAuth }) {
+  const { authNotice, clearAuthNotice } = useAuth();
+  if (!authNotice) return null;
+
+  const isSuccess = authNotice.type === 'success';
+
+  return (
+    <div 
+      style={{
+        backgroundColor: isSuccess ? '#ecfdf5' : '#fef2f2',
+        borderBottom: `1px solid ${isSuccess ? '#a7f3d0' : '#fecaca'}`,
+        padding: '0.75rem 1.25rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '0.75rem',
+        color: isSuccess ? '#065f46' : '#991b1b',
+        fontSize: '0.875rem',
+        fontWeight: '500',
+        position: 'sticky',
+        top: 0,
+        zIndex: 90
+      }}
+      role="status"
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+        <span style={{ fontSize: '1.2rem' }}>{isSuccess ? '✅' : '⚠️'}</span>
+        <div>
+          <strong>{authNotice.title}:</strong> {authNotice.message}
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {!isSuccess && onOpenAuth && (
+          <button
+            type="button"
+            className="btn-primary btn-sm"
+            style={{ fontSize: '0.8rem', padding: '0.3rem 0.75rem' }}
+            onClick={onOpenAuth}
+          >
+            Resend Email
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={clearAuthNotice}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: 'inherit', padding: '0.2rem 0.4rem', lineHeight: 1 }}
+          aria-label="Dismiss banner"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [activeModalSign, setActiveModalSign] = useState(null);
@@ -59,6 +115,9 @@ export function App() {
           setActiveTab={handleSetActiveTab} 
           onOpenAuth={() => setIsAuthModalOpen(true)}
         />
+
+        {/* Global Auth Status Notification (for email confirmation & callbacks) */}
+        <AuthNotificationBanner onOpenAuth={() => setIsAuthModalOpen(true)} />
 
         {/* Main Dynamic View */}
         <main className="main-content" id="main-content" role="main">

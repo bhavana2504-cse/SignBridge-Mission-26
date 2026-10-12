@@ -344,9 +344,17 @@
   gap: 0.4rem;
 }
 
-.metric-tile-val.blue { color: #2563eb; }
-.metric-tile-val.purple { color: #7c3aed; }
-.metric-tile-val.gold { color: #d97706; }
+.metric-tile-val.blue {
+  color: #2563eb;
+}
+
+.metric-tile-val.purple {
+  color: #7c3aed;
+}
+
+.metric-tile-val.gold {
+  color: #d97706;
+}
 
 .metric-progress-track {
   width: 100%;
@@ -1193,9 +1201,17 @@
 }
 
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.4; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 .practice-action-bar {
@@ -1382,9 +1398,20 @@
 }
 
 @keyframes scalePing {
-  0% { transform: scale(0.8); opacity: 0.8; }
-  50% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(0.8); opacity: 0.8; }
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
 }
 
 .sync-comparison-card {
@@ -1476,3 +1503,484 @@
   background-color: #f8faff;
 }
 
+
+/* ============================================
+   SIGNBRIDGE | PURPLE DREAMS THEME
+   Visual changes only. Preserve existing layout.
+   ============================================ */
+
+.app-layout {
+  --bg-canvas: #F8F5FF;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F0EAFB;
+  --bg-overlay: rgba(27, 32, 92, 0.55);
+
+  --color-primary-50: #F5F0FF;
+  --color-primary-100: #E9E3F2;
+  --color-primary-200: #D8C9ED;
+  --color-primary-500: #7D70BD;
+  --color-primary-600: #5652A3;
+  --color-primary-700: #45416F;
+  --color-primary-800: #34305F;
+  --color-primary-900: #1B205C;
+
+  --color-teal-bg: #F9E5F5;
+  --color-streak-bg: #FFF0F7;
+  --color-coin-bg: #FFF4DF;
+  --color-success: #38785F;
+  --color-success-bg: #E8F6EE;
+  --color-error: #B4234B;
+  --color-error-bg: #FFF0F3;
+
+  --text-main: #1B205C;
+  --text-body: #45416F;
+  --text-muted: #77708F;
+  --border-light: #E9E3F2;
+  --border-medium: #CFC3E4;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.85rem;
+  --radius-lg: 1.1rem;
+  --radius-xl: 1.4rem;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 12px rgba(66, 49, 120, 0.07);
+  --shadow-md: 0 8px 24px rgba(66, 49, 120, 0.11);
+  --shadow-lg: 0 16px 40px rgba(27, 32, 92, 0.16);
+
+  --font-heading: "Trebuchet MS", "Segoe UI", sans-serif;
+
+  background-color: var(--bg-canvas);
+  color: var(--text-main);
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+/* Consistent typography without changing page layouts */
+
+.app-layout h1,
+.app-layout h2,
+.app-layout h3,
+.app-layout h4,
+.app-layout .brand-title {
+  color: #1B205C;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  letter-spacing: -0.025em;
+}
+
+.app-layout p {
+  color: var(--text-body);
+}
+
+/* Header and navigation */
+
+.site-header {
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom-color: #E9E3F2;
+  box-shadow: 0 3px 16px rgba(66, 49, 120, 0.06);
+}
+
+.brand-icon-box {
+  color: #5652A3;
+}
+
+.brand-title {
+  color: #1B205C;
+}
+
+.desktop-nav {
+  background: #F8F5FF;
+  border-color: #E9E3F2;
+}
+
+.nav-item-btn {
+  transition: background-color 180ms ease,
+    color 180ms ease;
+}
+
+.nav-item-btn:hover,
+.mobile-nav-btn:hover {
+  color: #5652A3;
+  background-color: #F5F0FF;
+}
+
+.nav-item-btn.active {
+  background: #5652A3;
+  color: #FFFFFF;
+  box-shadow: 0 3px 10px rgba(86, 82, 163, 0.22);
+}
+
+.mobile-nav-btn.active,
+.category-nav-item.active,
+.dashboard-nav-item.active {
+  background-color: #5652A3;
+  color: #FFFFFF;
+}
+
+.pill-status-badge.streak {
+  background: #FFF0F7;
+  color: #A33B7D;
+  border-color: #F4D2E9;
+}
+
+.pill-status-badge.coins {
+  background: #FFF4DF;
+  color: #8C5D18;
+  border-color: #F2DFB5;
+}
+
+.avatar-nav-circle {
+  border-color: #D982C7;
+  background-color: #F5E4F5;
+}
+
+/* Buttons: rich purple with restrained pink accents */
+
+.btn-primary {
+  background: #5652A3;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(86, 82, 163, 0.2);
+}
+
+.btn-primary:hover {
+  background: #45416F;
+}
+
+.btn-secondary {
+  background: #FFFFFF;
+  color: #5652A3;
+  border-color: #CFC3E4;
+}
+
+.btn-secondary:hover {
+  background: #F5F0FF;
+  border-color: #9D7DC5;
+  color: #45416F;
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.nav-item-btn:focus-visible,
+.chip-btn:focus-visible,
+.quiz-option-btn:focus-visible {
+  outline: 3px solid #D982C7;
+  outline-offset: 3px;
+}
+
+/* Homepage: gentle lavender atmosphere */
+
+.hero-section {
+  background:
+    radial-gradient(circle at 85% 20%,
+      rgba(236, 166, 213, 0.22),
+      transparent 32%),
+    linear-gradient(145deg,
+      #F0EDFF 0%,
+      #F8F5FF 58%,
+      #FBEFF8 100%);
+}
+
+.hero-title {
+  color: #5652A3;
+}
+
+.hero-lead {
+  color: #45416F;
+}
+
+.hero-tag-text {
+  color: #5652A3;
+}
+
+/* Homepage: metrics and promotional cards */
+
+.metric-tile,
+.path-card,
+.sign-card,
+.lesson-viewer-card,
+.category-nav-panel,
+.dashboard-sidebar,
+.practice-pane,
+.quiz-card {
+  background-color: #FFFFFF;
+  border-color: #E9E3F2;
+  box-shadow: var(--shadow-sm);
+}
+
+.metric-tile-label {
+  color: #77708F;
+}
+
+.metric-tile-val {
+  color: #1B205C;
+}
+
+.metric-tile-val.blue {
+  color: #5652A3;
+}
+
+.metric-tile-val.purple {
+  color: #9D7DC5;
+}
+
+.metric-tile-val.gold {
+  color: #B77925;
+}
+
+.metric-progress-track {
+  background-color: #EEE8F6;
+}
+
+.metric-progress-fill {
+  background: linear-gradient(90deg, #5652A3, #D982C7);
+}
+
+.promo-card.learn {
+  background: linear-gradient(135deg, #EAE5FF, #F7E8FA);
+  border-color: #D8C9ED;
+}
+
+.promo-card.test {
+  background: linear-gradient(135deg, #FFF0F7, #FFF5E8);
+  border-color: #F0D3E6;
+}
+
+.promo-card.goal {
+  background: linear-gradient(145deg, #FFFFFF, #F9F3FC);
+  border-color: #E9D9EF;
+}
+
+.promo-card-badge.purple {
+  color: #5652A3;
+  background: #FFFFFF;
+}
+
+.promo-card-badge.orange {
+  color: #A33B7D;
+  background: #FFFFFF;
+}
+
+/* Learning paths: keep existing cards and arrangement */
+
+.path-card:hover,
+.sign-card:hover {
+  border-color: #C5A8E2;
+  box-shadow: 0 9px 24px rgba(86, 82, 163, 0.12);
+}
+
+.path-card-icon-box {
+  background: linear-gradient(145deg, #F0EBFF, #FBE8F5);
+}
+
+.path-card-title,
+.sign-card-title {
+  color: #1B205C;
+}
+
+.path-card-desc,
+.sign-card-desc {
+  color: #77708F;
+}
+
+.path-card-meta,
+.sign-card-footer {
+  border-top-color: #E9E3F2;
+}
+
+.category-badge {
+  background: #F2EDFF;
+  color: #5652A3;
+  border-color: #D8C9ED;
+}
+
+.category-badge.teal {
+  background: #F9E5F5;
+  color: #8A397B;
+  border-color: #EEC5E4;
+}
+
+/* Lessons: calm panels and clear active selections */
+
+.category-nav-item {
+  color: #45416F;
+}
+
+.category-nav-item:hover,
+.dashboard-nav-item:hover {
+  background-color: #F5F0FF;
+  color: #5652A3;
+}
+
+.lesson-word-title {
+  color: #1B205C;
+}
+
+.lesson-context-box {
+  background: #F5F0FF;
+  border-left-color: #D982C7;
+}
+
+/* Dictionary: soft search fields and lavender filters */
+
+.dict-search-bar {
+  background: #FFFFFF;
+  border-color: #E9E3F2;
+}
+
+.dict-search-bar:focus-within {
+  border-color: #9D7DC5;
+}
+
+.dict-search-input {
+  color: #1B205C;
+}
+
+.chip-btn {
+  background: #FFFFFF;
+  border-color: #E9E3F2;
+  color: #45416F;
+}
+
+.chip-btn:hover {
+  background: #F5F0FF;
+  border-color: #D8C9ED;
+}
+
+.chip-btn.active {
+  background: #5652A3;
+  border-color: #5652A3;
+  color: #FFFFFF;
+}
+
+.tab-btn.active {
+  color: #5652A3;
+  border-bottom-color: #D982C7;
+}
+
+/* Practice studio: make the surrounding UI feel softer.
+   Keep the video and avatar backgrounds dark for contrast. */
+
+.practice-pane {
+  background: #FFFFFF;
+  border-color: #E9E3F2;
+}
+
+.practice-hero-badge {
+  background: #F5EAFB;
+  color: #5652A3;
+}
+
+.sync-comparison-card {
+  background: linear-gradient(145deg, #FFFFFF, #F7F2FF);
+  border-color: #D8C9ED;
+}
+
+.notice-box.info {
+  background: #F8F5FF;
+  border-color: #D8C9ED;
+}
+
+/* Quizzes: clear choices and readable feedback */
+
+.quiz-option-btn {
+  background: #FFFFFF;
+  border-color: #E9E3F2;
+  color: #1B205C;
+}
+
+.quiz-option-btn:hover:not(:disabled),
+.quiz-option-btn.selected {
+  background: #F5F0FF;
+  border-color: #9D7DC5;
+}
+
+.quiz-option-btn.correct {
+  background: #E8F6EE;
+  border-color: #5B9B7D;
+  color: #245B43;
+}
+
+.quiz-option-btn.incorrect {
+  background: #FFF0F3;
+  border-color: #D98AA3;
+  color: #9F2349;
+}
+
+.quiz-score-circle {
+  background: #F5F0FF;
+  border-color: #9D7DC5;
+}
+
+.quiz-score-num,
+.quiz-score-label {
+  color: #5652A3;
+}
+
+/* Progress dashboard: restrained pink for rewards */
+
+.dashboard-nav-item {
+  color: #45416F;
+}
+
+.badges-row {
+  background: linear-gradient(135deg, #F8F5FF, #FFF2FA);
+  border-color: #E9E3F2;
+}
+
+/* Footer: coordinate it with the rest of the app */
+
+.site-footer {
+  background: #FFFFFF;
+  border-top-color: #E9E3F2;
+  color: #77708F;
+}
+
+.footer-heading {
+  color: #1B205C;
+}
+
+.footer-btn-link:hover {
+  color: #9D7DC5;
+}
+
+/* Modal panels */
+
+.modal-container {
+  background: #FFFFFF;
+  border-color: #E9E3F2;
+}
+
+.modal-header {
+  border-bottom-color: #E9E3F2;
+}
+
+/* Motion: subtle, not distracting */
+
+@media (prefers-reduced-motion: no-preference) {
+
+  .btn-primary,
+  .btn-secondary,
+  .path-card,
+  .sign-card,
+  .avatar-nav-circle {
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+}
+
+/* Small screens: preserve layout and avoid overflow */
+
+@media (max-width: 600px) {
+  .hero-title {
+    overflow-wrap: break-word;
+  }
+
+  .promo-card,
+  .metric-tile,
+  .path-card,
+  .sign-card {
+    min-width: 0;
+  }
+}

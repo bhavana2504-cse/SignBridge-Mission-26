@@ -22,6 +22,8 @@ export function Header({ activeTab, setActiveTab, onOpenAuth }) {
   const [quizAttempts, setQuizAttempts] = useState(0);
   const [userProfile, setUserProfile] = useState({ name: 'Sign Learner', avatar: 'avatar_sage' });
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [coins, setCoins] = useState(storageService.getCoins());
+  const [streakDays, setStreakDays] = useState(storageService.getDisplayStreak());
 
   const { user, signOut } = useAuth();
   const totalSigns = signService.getAllSigns().length;
@@ -31,6 +33,8 @@ export function Header({ activeTab, setActiveTab, onOpenAuth }) {
     setCompletedCount(completed.length);
     setQuizAttempts(storageService.getQuizHistory().length);
     setUserProfile(storageService.getUserProfile());
+    setCoins(storageService.getCoins());
+    setStreakDays(storageService.getDisplayStreak());
   };
 
   useEffect(() => {
@@ -57,11 +61,6 @@ export function Header({ activeTab, setActiveTab, onOpenAuth }) {
     setShowUserDropdown(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  // Coins calculated: base 120 + bonus for completed signs & quizzes
-  const coins = 120 + (completedCount * 10) + (quizAttempts * 15);
-  // Dynamic streak (default 5 days as displayed in reference)
-  const streakDays = Math.max(5, Math.min(30, 5 + Math.floor(completedCount / 3)));
 
   // Display user name
   const displayName = user?.user_metadata?.full_name || userProfile.name || (user?.email ? user.email.split('@')[0] : 'Sign Learner');
