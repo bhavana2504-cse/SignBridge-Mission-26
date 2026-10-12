@@ -1,3 +1,4 @@
+import React from 'react';
 import { Heart, ShieldCheck, ExternalLink } from './Icons';
 
 export function Footer({ setActiveTab }) {

@@ -1,3 +1,4 @@
+import React, { useRef, useEffect } from 'react';
 import { X } from './Icons';
 
 export function Modal({ isOpen, onClose, title, children, maxWidth = '640px' }) {

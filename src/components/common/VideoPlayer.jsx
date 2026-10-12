@@ -1,3 +1,4 @@
+import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, RotateCcw, Repeat, AlertCircle } from './Icons';
 
 export function VideoPlayer({ 
