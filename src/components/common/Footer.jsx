@@ -32,6 +32,7 @@ export function Footer({ setActiveTab }) {
             <h4 className="footer-heading">Learning Modules</h4>
             <ul className="footer-list">
               <li><button className="footer-btn-link" onClick={() => handleNav('lessons')}>Video Lessons</button></li>
+              <li><button className="footer-btn-link" onClick={() => handleNav('guides')}>Illustrated Sign Guides</button></li>
               <li><button className="footer-btn-link" onClick={() => handleNav('dictionary')}>Sign Dictionary</button></li>
               <li><button className="footer-btn-link" onClick={() => handleNav('practice')}>Self-Practice Studio</button></li>
               <li><button className="footer-btn-link" onClick={() => handleNav('quiz')}>Interactive Quizzes</button></li>

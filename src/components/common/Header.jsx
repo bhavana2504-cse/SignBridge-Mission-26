@@ -45,10 +45,10 @@ export function Header({ activeTab, setActiveTab, onOpenAuth }) {
     };
   }, []);
 
-  // Main nav items matching reference design: Home, Learn, Practice, Progress
   const navItems = [
     { id: 'home', label: 'Home' },
     { id: 'lessons', label: 'Learn' },
+    { id: 'guides', label: 'Sign Guides' },
     { id: 'dictionary', label: 'Dictionary' },
     { id: 'practice', label: 'Practice' },
     { id: 'quiz', label: 'Quizzes' },

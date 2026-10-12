@@ -369,6 +369,61 @@ export function HomePage({ setActiveTab, onSelectSign, onStartPractice }) {
           </div>
         </section>
 
+        {/* 5b. New Sign Guides Visual Library Highlight Card */}
+        <section style={{ marginBottom: '2.5rem' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)',
+            border: '1px solid #ddd6fe',
+            borderRadius: 'var(--radius-xl)',
+            padding: '1.75rem 2rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1.25rem',
+            boxShadow: '0 4px 14px rgba(124, 58, 237, 0.06)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div style={{
+                width: '54px',
+                height: '54px',
+                borderRadius: '14px',
+                backgroundColor: '#7c3aed',
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.75rem',
+                flexShrink: 0,
+                boxShadow: '0 4px 10px rgba(124, 58, 237, 0.25)'
+              }}>
+                📚
+              </div>
+              <div>
+                <span className="category-badge" style={{ backgroundColor: '#fff', color: '#7c3aed', marginBottom: '0.35rem' }}>
+                  New Educational Resource
+                </span>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: '800', color: '#4c1d95', margin: '0.2rem 0' }}>
+                  Illustrated Sign Guides & Infographics
+                </h3>
+                <p style={{ fontSize: '0.9rem', color: '#6d28d9', margin: 0, maxWidth: '580px', lineHeight: 1.5 }}>
+                  Inspect 17 visual infographics covering ISL finger configurations, step-by-step phrases, questions, numbers, and the complete A-Z fingerspelling alphabet.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="btn-primary"
+              style={{ backgroundColor: '#7c3aed', borderColor: '#7c3aed' }}
+              onClick={() => setActiveTab('guides')}
+            >
+              <span>Explore Sign Guides</span>
+              <ArrowRight size={18} />
+            </button>
+          </div>
+        </section>
+
         {/* 6. Standard Alignment Notice */}
         <section style={{ marginBottom: '3rem' }}>
           <div style={{ background: 'linear-gradient(135deg, #eef2ff 0%, #ffffff 100%)', border: '1px solid var(--color-primary-200)', borderRadius: 'var(--radius-xl)', padding: '1.5rem 1.75rem', display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>

@@ -4,12 +4,16 @@ import { VideoPlayer } from './VideoPlayer';
 import { Heart, CheckCircle2, Video, Sparkles, AlertCircle } from './Icons';
 import { storageService } from '../../services/storageService';
 import { aiService } from '../../services/aiService';
+import { guideService } from '../../data/signGuidesData';
 
 export function SignDetailModal({ sign, isOpen, onClose, onStartPractice }) {
   if (!sign) return null;
 
   const [isFav, setIsFav] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [selectedGuide, setSelectedGuide] = useState(null);
+
+  const matchingGuides = sign ? guideService.getGuidesBySignId(sign.id) : [];
 
   // Gemini AI state
   const [aiExplanation, setAiExplanation] = useState(null);
@@ -160,6 +164,105 @@ export function SignDetailModal({ sign, isOpen, onClose, onStartPractice }) {
           </div>
         )}
       </div>
+
+      {/* Linked Illustrated Step-by-Step Infographic Guides */}
+      {matchingGuides.length > 0 && (
+        <div style={{
+          backgroundColor: '#faf5ff',
+          border: '1px solid #e9d5ff',
+          borderRadius: 'var(--radius-lg)',
+          padding: '1rem',
+          marginTop: '0.75rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <span style={{ fontSize: '1.2rem' }}>📖</span>
+              <strong style={{ fontSize: '0.9rem', color: '#6b21a8' }}>
+                Illustrated Infographic Guide ({matchingGuides.length})
+              </strong>
+            </div>
+            <span style={{ fontSize: '0.75rem', color: '#9333ea', fontWeight: '600' }}>
+              Educational Aid
+            </span>
+          </div>
+
+          <p style={{ fontSize: '0.825rem', color: '#581c87', marginBottom: '0.75rem', lineHeight: 1.45 }}>
+            Use this illustrated step-by-step breakdown to study the exact finger placement and hand movement alongside the video demonstration.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+            {matchingGuides.map((guide) => (
+              <div 
+                key={guide.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  backgroundColor: '#fff',
+                  border: '1px solid #f3e8ff',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '0.5rem',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+                }}
+              >
+                <img
+                  src={guide.imagePath}
+                  alt={guide.altText}
+                  style={{
+                    width: '60px',
+                    height: '60px',
+                    objectFit: 'cover',
+                    borderRadius: '6px',
+                    border: '1px solid var(--border-light)'
+                  }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <strong style={{ fontSize: '0.875rem', color: 'var(--text-main)', display: 'block' }}>
+                    {guide.phrase}
+                  </strong>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                    {guide.description}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="btn-secondary btn-sm"
+                  style={{ fontSize: '0.775rem', padding: '0.35rem 0.65rem', flexShrink: 0 }}
+                  onClick={() => setSelectedGuide(guide)}
+                >
+                  View Guide
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Guide Detail Viewer Modal if selected */}
+      {selectedGuide && (
+        <Modal
+          isOpen={Boolean(selectedGuide)}
+          onClose={() => setSelectedGuide(null)}
+          title={`Illustrated Guide: ${selectedGuide.phrase}`}
+          maxWidth="900px"
+        >
+          <div style={{ textAlign: 'center', maxHeight: '75vh', overflow: 'auto' }}>
+            <img
+              src={selectedGuide.imagePath}
+              alt={selectedGuide.altText}
+              style={{
+                maxWidth: '100%',
+                height: 'auto',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+              }}
+            />
+            <p style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              {selectedGuide.description}
+            </p>
+          </div>
+        </Modal>
+      )}
 
       {/* Bottom CTA to practice with webcam */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>

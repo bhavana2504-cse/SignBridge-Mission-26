@@ -1984,3 +1984,46 @@
     min-width: 0;
   }
 }
+
+/* ==============================================================================
+   Sign Guides & Infographics Library Styles
+   ============================================================================== */
+.sign-card:hover .guide-card-img {
+  transform: scale(1.04);
+}
+
+.sign-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(92, 84, 229, 0.12);
+}
+
+.filter-pill {
+  padding: 0.45rem 0.95rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid var(--border-light);
+  background-color: #fff;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-pill:hover {
+  background-color: var(--bg-subtle);
+  color: var(--color-primary-700);
+  border-color: var(--color-primary-300);
+}
+
+.filter-pill.active {
+  background-color: var(--color-primary-600);
+  color: #fff;
+  border-color: var(--color-primary-600);
+  box-shadow: 0 2px 8px rgba(92, 84, 229, 0.25);
+}
+
+@media (max-width: 768px) {
+  .guide-modal-split {
+    grid-template-columns: 1fr !important;
+  }
+}

@@ -35,3 +35,7 @@ lerna-debug.log*
 
 # Scratch & temporary test scripts
 scratch/
+
+# Archives
+*.zip
+

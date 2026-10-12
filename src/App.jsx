@@ -9,6 +9,7 @@ import { QuizPage } from './components/quiz/QuizPage';
 import { ProgressPage } from './components/progress/ProgressPage';
 import { SignDetailModal } from './components/common/SignDetailModal';
 import { AuthModal } from './components/auth/AuthModal';
+import { SignGuidesPage } from './components/guides/SignGuidesPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import './styles/App.css';
 
@@ -78,7 +79,7 @@ export function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '').toLowerCase();
-      const validTabs = ['home', 'lessons', 'dictionary', 'practice', 'quiz', 'progress'];
+      const validTabs = ['home', 'lessons', 'guides', 'dictionary', 'practice', 'quiz', 'progress'];
       if (validTabs.includes(hash)) {
         setActiveTab(hash);
       } else if (hash === 'login' || hash === 'signin' || hash === 'signup') {
@@ -131,6 +132,13 @@ export function App() {
 
           {activeTab === 'lessons' && (
             <LessonsPage
+              onStartPractice={handleStartPractice}
+            />
+          )}
+
+          {activeTab === 'guides' && (
+            <SignGuidesPage
+              onSelectSign={handleSelectSign}
               onStartPractice={handleStartPractice}
             />
           )}

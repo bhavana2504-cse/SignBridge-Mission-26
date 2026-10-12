@@ -78,7 +78,10 @@ Keep it encouraging, clear, and under 130 words.`;
     ],
     server: {
       port: 5173,
-      open: false
+      open: false,
+      watch: {
+        ignored: ['**/*.zip', '**/.git/**', '**/dist/**', '**/scratch/**', '**/public/**']
+      }
     }
   };
 });
