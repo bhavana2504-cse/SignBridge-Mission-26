@@ -1,4 +1,4 @@
-import { VIDEO_MAPPINGS, getVideoPath } from './videoMapping';
+import { VIDEO_MAPPINGS, getVideoPath } from './videoMapping.js';
 
 /**
  * Standard Categories in SignBridge ISL Curriculum

@@ -56,7 +56,7 @@ export const VIDEO_MAPPINGS = {
  */
 export function getVideoPath(key) {
   if (!key) return null;
-  const normalizedKey = key.toLowerCase().replace(/\s+/g, '_');
+  const normalizedKey = key.toLowerCase().replace(/[-\s]+/g, '_');
   const filename = VIDEO_MAPPINGS[normalizedKey];
   return filename ? `/videos/${filename}` : null;
 }

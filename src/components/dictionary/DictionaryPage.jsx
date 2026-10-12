@@ -34,6 +34,8 @@ export function DictionaryPage({ onSelectSign, onStartPractice }) {
     };
   }, []);
 
+  const [sortBy, setSortBy] = useState('default'); // 'default' | 'az' | 'za'
+
   const displayedSigns = useMemo(() => {
     // 1. Filter by view tab
     let pool = signService.getAllSigns();
@@ -64,8 +66,15 @@ export function DictionaryPage({ onSelectSign, onStartPractice }) {
       });
     }
 
+    // 4. Sort order
+    if (sortBy === 'az') {
+      return [...pool].sort((a, b) => a.word.localeCompare(b.word));
+    } else if (sortBy === 'za') {
+      return [...pool].sort((a, b) => b.word.localeCompare(a.word));
+    }
+
     return pool;
-  }, [searchQuery, selectedCategory, activeTab, favorites, recentlyViewed]);
+  }, [searchQuery, selectedCategory, activeTab, favorites, recentlyViewed, sortBy]);
 
   return (
     <div className="container" style={{ paddingTop: '2rem' }}>
@@ -153,12 +162,30 @@ export function DictionaryPage({ onSelectSign, onStartPractice }) {
       </div>
 
       {/* Results Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
           Showing <strong>{displayedSigns.length}</strong> signs
           {selectedCategory !== 'All' && ` in "${selectedCategory}"`}
           {searchQuery && ` matching "${searchQuery}"`}
         </span>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <label htmlFor="dict-sort-select" style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+            Sort:
+          </label>
+          <select
+            id="dict-sort-select"
+            className="speed-select"
+            style={{ backgroundColor: 'var(--bg-surface)', color: 'var(--text-main)', border: '1px solid var(--border-medium)', padding: '0.3rem 0.65rem' }}
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            aria-label="Sort dictionary items"
+          >
+            <option value="default">Curriculum Order</option>
+            <option value="az">Alphabetical (A → Z)</option>
+            <option value="za">Alphabetical (Z → A)</option>
+          </select>
+        </div>
       </div>
 
       {/* Signs Grid */}
