@@ -7,19 +7,26 @@ import {
   BarChart2, 
   Menu, 
   X, 
-  CheckCircle2 
+  CheckCircle2,
+  Sparkles
 } from './Icons';
+import { BridgeLogo } from './Illustrations';
 import { storageService } from '../../services/storageService';
 import { signService } from '../../services/signService';
 
 export function Header({ activeTab, setActiveTab }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
+  const [quizAttempts, setQuizAttempts] = useState(0);
+  const [userProfile, setUserProfile] = useState({ name: 'Sign Learner', avatar: 'avatar_sage' });
+
   const totalSigns = signService.getAllSigns().length;
 
   const updateStats = () => {
     const completed = storageService.getCompletedLessons();
     setCompletedCount(completed.length);
+    setQuizAttempts(storageService.getQuizHistory().length);
+    setUserProfile(storageService.getUserProfile());
   };
 
   useEffect(() => {
@@ -30,13 +37,14 @@ export function Header({ activeTab, setActiveTab }) {
     };
   }, []);
 
+  // Main nav items matching reference design: Home, Learn, Practice, Progress
   const navItems = [
-    { id: 'home', label: 'Home', icon: null },
-    { id: 'lessons', label: 'Lessons', icon: BookOpen },
-    { id: 'dictionary', label: 'Sign Dictionary', icon: Search },
-    { id: 'practice', label: 'Self Practice', icon: Video },
-    { id: 'quiz', label: 'Quizzes', icon: Award },
-    { id: 'progress', label: 'Progress', icon: BarChart2 },
+    { id: 'home', label: 'Home' },
+    { id: 'lessons', label: 'Learn' },
+    { id: 'dictionary', label: 'Dictionary' },
+    { id: 'practice', label: 'Practice' },
+    { id: 'quiz', label: 'Quizzes' },
+    { id: 'progress', label: 'Progress' }
   ];
 
   const handleNavClick = (tabId) => {
@@ -45,11 +53,16 @@ export function Header({ activeTab, setActiveTab }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Coins calculated: base 120 + bonus for completed signs & quizzes
+  const coins = 120 + (completedCount * 10) + (quizAttempts * 15);
+  // Dynamic streak (default 5 days as displayed in reference)
+  const streakDays = Math.max(5, Math.min(30, 5 + Math.floor(completedCount / 3)));
+
   return (
     <header className="site-header" role="banner">
       <div className="container">
         <div className="header-inner">
-          {/* Brand Logo */}
+          {/* Brand Logo with Bridge Icon */}
           <a 
             href="#home" 
             className="brand-link" 
@@ -57,47 +70,53 @@ export function Header({ activeTab, setActiveTab }) {
             aria-label="SignBridge Home"
           >
             <div className="brand-icon-box" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
-                <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
-                <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
-                <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
-              </svg>
+              <BridgeLogo size={30} color="#5c54e5" />
             </div>
             <div>
               <span className="brand-title">SignBridge</span>
-              <span className="brand-badge">ISL</span>
             </div>
           </a>
 
-          {/* Desktop Navigation */}
+          {/* Center Pill Navigation (Matching Reference) */}
           <nav className="desktop-nav" role="navigation" aria-label="Main Navigation">
             {navItems.map((item) => {
-              const Icon = item.icon;
+              const isActive = activeTab === item.id || (item.id === 'lessons' && activeTab === 'lessons');
               return (
                 <button
                   key={item.id}
-                  className={`nav-item-btn ${activeTab === item.id ? 'active' : ''}`}
+                  className={`nav-item-btn ${isActive ? 'active' : ''}`}
                   onClick={() => handleNavClick(item.id)}
-                  aria-current={activeTab === item.id ? 'page' : undefined}
+                  aria-current={isActive ? 'page' : undefined}
                 >
-                  {Icon && <Icon size={17} aria-hidden="true" />}
                   <span>{item.label}</span>
                 </button>
               );
             })}
           </nav>
 
-          {/* Header Right Actions */}
+          {/* Header Right Status Badges: Streak, Coins, Profile */}
           <div className="header-right">
+            {/* Streak Badge */}
+            <div className="pill-status-badge streak" title={`${streakDays} days active learning streak`}>
+              <span>🔥</span>
+              <span>{streakDays}</span>
+            </div>
+
+            {/* Coins Badge */}
+            <div className="pill-status-badge coins" title={`${coins} learning coins earned`}>
+              <span>🪙</span>
+              <span>{coins} Coins</span>
+            </div>
+
+            {/* Profile Avatar */}
             <button 
-              className="progress-pill-btn"
+              type="button"
+              className="avatar-nav-circle"
               onClick={() => handleNavClick('progress')}
-              title="View your learning progress"
-              aria-label={`Learning progress: ${completedCount} of ${totalSigns} signs completed`}
+              title={`View ${userProfile.name}'s Progress`}
+              aria-label="User Profile"
             >
-              <CheckCircle2 size={16} color="var(--color-primary-600)" aria-hidden="true" />
-              <span>{completedCount} / {totalSigns} Signs</span>
+              <span>👩‍🎓</span>
             </button>
 
             {/* Mobile Hamburger Button */}
@@ -116,19 +135,15 @@ export function Header({ activeTab, setActiveTab }) {
       {/* Mobile Drawer */}
       {isMobileMenuOpen && (
         <div className="mobile-drawer" role="navigation" aria-label="Mobile Navigation">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                className={`mobile-nav-btn ${activeTab === item.id ? 'active' : ''}`}
-                onClick={() => handleNavClick(item.id)}
-              >
-                {Icon && <Icon size={19} aria-hidden="true" />}
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              className={`mobile-nav-btn ${activeTab === item.id ? 'active' : ''}`}
+              onClick={() => handleNavClick(item.id)}
+            >
+              <span>{item.label}</span>
+            </button>
+          ))}
         </div>
       )}
     </header>

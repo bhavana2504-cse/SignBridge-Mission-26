@@ -7,8 +7,10 @@ import {
   Video, 
   BookOpen, 
   Sparkles, 
-  RotateCcw 
+  RotateCcw,
+  Layers 
 } from '../common/Icons';
+import { InstructorHeroIllustration } from '../common/Illustrations';
 import { VideoPlayer } from '../common/VideoPlayer';
 import { signService } from '../../services/signService';
 import { storageService } from '../../services/storageService';
@@ -39,7 +41,6 @@ export function LessonsPage({ onStartPractice, initialCategory = null }) {
     if (currentSignIndex < signsInCategory.length - 1) {
       setCurrentSignIndex(currentSignIndex + 1);
     } else {
-      // Loop or go to next category
       const currentCatIdx = categories.indexOf(selectedCategory);
       if (currentCatIdx < categories.length - 1) {
         setSelectedCategory(categories[currentCatIdx + 1]);
@@ -68,7 +69,6 @@ export function LessonsPage({ onStartPractice, initialCategory = null }) {
     setIsFav(updated);
   };
 
-  // Completed count in this category
   const completedInCat = signsInCategory.filter((s) => 
     storageService.isLessonCompleted(s.id)
   ).length;
@@ -77,20 +77,46 @@ export function LessonsPage({ onStartPractice, initialCategory = null }) {
 
   return (
     <div className="container" style={{ paddingTop: '2rem' }}>
-      <div className="section-header">
-        <span className="section-eyebrow">Structured Curriculum</span>
-        <h1 className="section-title">ISL Video Lessons</h1>
-        <p className="section-subtitle">
-          Master vocabulary sign-by-sign with slow-motion replays, context sentences, and progress tracking.
-        </p>
+      {/* Top Learning Banner matching Reference Screenshot */}
+      <div 
+        style={{
+          background: 'linear-gradient(135deg, #eef2ff 0%, #f4f6fe 100%)',
+          border: '1px solid var(--border-light)',
+          borderRadius: 'var(--radius-xl)',
+          padding: '1.75rem 2rem',
+          marginBottom: '2rem',
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: '1.5rem',
+          alignItems: 'center'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.25rem' }}>
+          <div>
+            <span className="category-badge" style={{ marginBottom: '0.5rem' }}>
+              <span>📖</span>
+              <span>Interactive Curriculum</span>
+            </span>
+            <h1 style={{ fontSize: '2.1rem', fontWeight: '800', color: 'var(--text-main)', marginTop: '0.25rem' }}>
+              Learn Indian Sign Language
+            </h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '520px', marginTop: '0.25rem' }}>
+              Explore standardized video demonstrations, observe correct handshapes, and master everyday ISL phrases.
+            </p>
+          </div>
+
+          <div style={{ width: '130px', height: '130px', flexShrink: 0, display: 'none' }}>
+            <InstructorHeroIllustration width="100%" height="100%" />
+          </div>
+        </div>
       </div>
 
       <div className="lesson-layout">
         {/* Left Column: Category Navigation */}
         <aside className="category-nav-panel" aria-label="Curriculum categories">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            <BookOpen size={18} color="var(--color-primary-700)" aria-hidden="true" />
-            <h2 style={{ fontSize: '1.05rem', fontWeight: '700' }}>Modules</h2>
+            <BookOpen size={20} color="var(--color-primary-600)" aria-hidden="true" />
+            <h2 style={{ fontSize: '1.15rem', fontWeight: '800', color: 'var(--text-main)' }}>Categories</h2>
           </div>
 
           <ul className="category-nav-list">
@@ -117,13 +143,44 @@ export function LessonsPage({ onStartPractice, initialCategory = null }) {
             })}
           </ul>
 
-          <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)' }}>
-              <span>Module Mastery</span>
+          <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-light)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)' }}>
+              <span>Module Progress</span>
               <span>{catProgressPercent}%</span>
             </div>
-            <div className="progress-bar-track">
-              <div className="progress-bar-fill" style={{ width: `${catProgressPercent}%` }}></div>
+            <div className="metric-progress-track">
+              <div className="metric-progress-fill" style={{ width: `${catProgressPercent}%` }}></div>
+            </div>
+          </div>
+
+          {/* Signs Quick Selector List */}
+          <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-light)' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '0.65rem' }}>
+              Signs in this module:
+            </span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+              {signsInCategory.map((s, idx) => {
+                const isCurrent = idx === currentSignIndex;
+                const isDone = storageService.isLessonCompleted(s.id);
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    style={{
+                      fontSize: '0.8rem',
+                      fontWeight: '700',
+                      padding: '0.3rem 0.65rem',
+                      borderRadius: 'var(--radius-full)',
+                      backgroundColor: isCurrent ? 'var(--color-primary-600)' : isDone ? 'var(--color-success-bg)' : 'var(--bg-subtle)',
+                      color: isCurrent ? '#ffffff' : isDone ? 'var(--color-success)' : 'var(--text-body)',
+                      border: isCurrent ? '1px solid var(--color-primary-600)' : '1px solid var(--border-light)'
+                    }}
+                    onClick={() => setCurrentSignIndex(idx)}
+                  >
+                    {s.word} {isDone && '✓'}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </aside>
@@ -139,8 +196,8 @@ export function LessonsPage({ onStartPractice, initialCategory = null }) {
                     <span className="category-badge teal">Sign {currentSignIndex + 1} of {signsInCategory.length}</span>
                   </div>
                   <h2 id="lesson-sign-title" className="lesson-word-title">{currentSign.word}</h2>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-                    Source Benchmark: <strong>{currentSign.sourceDataset}</strong>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                    Dataset Source: <strong>{currentSign.sourceDataset}</strong>
                   </p>
                 </div>
 
@@ -175,12 +232,12 @@ export function LessonsPage({ onStartPractice, initialCategory = null }) {
                 loop={true}
               />
 
-              {/* Meaning & Context */}
+              {/* Meaning & Usage */}
               <div style={{ marginTop: '1.5rem' }}>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: '700', marginBottom: '0.4rem', color: 'var(--text-main)' }}>
-                  How to Use This Sign
+                <h3 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '0.4rem', color: 'var(--text-main)' }}>
+                  How to Sign "{currentSign.word}"
                 </h3>
-                <p style={{ fontSize: '0.95rem', color: 'var(--text-body)' }}>
+                <p style={{ fontSize: '0.95rem', color: 'var(--text-body)', lineHeight: '1.55' }}>
                   {currentSign.description}
                 </p>
               </div>
@@ -224,16 +281,17 @@ export function LessonsPage({ onStartPractice, initialCategory = null }) {
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button
                     type="button"
-                    className={`btn-secondary btn-sm ${isCompleted ? 'btn-outline-green' : ''}`}
+                    className={`btn-primary btn-sm`}
+                    style={{ backgroundColor: isCompleted ? 'var(--color-success)' : 'var(--color-primary-600)' }}
                     onClick={handleToggleComplete}
                   >
                     <CheckCircle2 size={16} />
-                    <span>{isCompleted ? 'Lesson Completed ✓' : 'Mark Completed'}</span>
+                    <span>{isCompleted ? 'Done ✓' : 'Mark Done'}</span>
                   </button>
 
                   <button
                     type="button"
-                    className="btn-primary btn-sm"
+                    className="btn-secondary btn-sm"
                     onClick={() => onStartPractice(currentSign.id)}
                   >
                     <Video size={16} />

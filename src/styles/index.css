@@ -1,72 +1,78 @@
 /* ==========================================================================
-   SignBridge - Design System & Core Styles
-   Aesthetics: Warm off-white canvas, Forest Green & Muted Teal accents, High Contrast
-   Accessibility: WCAG AA/AAA compliant contrast, visible focus rings, responsive typography
+   SignBridge - Approved UI Design System
+   Visual Aesthetics: 
+   - Pale blue & soft lavender-tinted canvas (#f0f4fd, #f6f8fe)
+   - Vibrant purple & indigo accents (#5c54e5, #4f46e5, #4338ca)
+   - Deep indigo readable typography (#1e1b4b, #2e2863)
+   - Playful rounded cards, subtle shadows, streak flames, and coin badges
    ========================================================================== */
 
 :root {
-  /* Surface & Backgrounds */
-  --bg-canvas: #fbfbf9;
+  /* Surfaces & Canvas */
+  --bg-canvas: #f0f4fd;
   --bg-surface: #ffffff;
-  --bg-subtle: #f3f5f3;
+  --bg-subtle: #f6f8fe;
   --bg-card: #ffffff;
-  --bg-overlay: rgba(22, 33, 26, 0.65);
+  --bg-overlay: rgba(30, 27, 75, 0.65);
 
-  /* Forest Green Palette (Primary) */
-  --color-primary-900: #10261c;
-  --color-primary-800: #1b4332;
-  --color-primary-700: #2d6a4f;
-  --color-primary-600: #40916c;
-  --color-primary-500: #52b788;
-  --color-primary-200: #b7e4c7;
-  --color-primary-100: #d8f3dc;
-  --color-primary-50: #f0f9f3;
+  /* Purple & Indigo Palette (Reference Design Primary) */
+  --color-primary-900: #1e1b4b;
+  --color-primary-800: #4338ca;
+  --color-primary-700: #4f46e5;
+  --color-primary-600: #5c54e5;
+  --color-primary-500: #6d64fa;
+  --color-primary-200: #c7d2fe;
+  --color-primary-100: #e0e7ff;
+  --color-primary-50: #eef2ff;
 
-  /* Muted Teal & Accent */
-  --color-accent-800: #19485b;
-  --color-accent-700: #205c74;
-  --color-accent-600: #2b748f;
-  --color-accent-100: #e2f1f5;
-  --color-accent-50: #f2f8f9;
+  /* Accent Tones (Coins, Streak, Goals, Tags) */
+  --color-streak: #f97316;
+  --color-streak-bg: #fff7ed;
+  --color-coin: #f59e0b;
+  --color-coin-bg: #fef3c7;
+  --color-goal-rose: #f43f5e;
+  --color-goal-bg: #ffe4e6;
+  --color-teal-badge: #06b6d4;
+  --color-teal-bg: #ecfeff;
 
-  /* Text & Neutrals (High Contrast) */
-  --text-main: #141c17;
-  --text-body: #323d37;
-  --text-muted: #5e6d65;
+  /* Text & Neutrals */
+  --text-main: #1e1b4b;
+  --text-body: #374151;
+  --text-muted: #64748b;
   --text-inverse: #ffffff;
 
   /* Borders & Dividers */
-  --border-light: #e4e8e4;
-  --border-medium: #cbd3cc;
-  --border-focus: #1b4332;
+  --border-light: #e2e8f8;
+  --border-medium: #cbd5e1;
+  --border-focus: #5c54e5;
 
   /* Semantic Feedback */
-  --color-success: #1b7a42;
-  --color-success-bg: #eafaf1;
-  --color-warning: #9a4e0a;
-  --color-warning-bg: #fdf5ea;
-  --color-error: #b91c1c;
+  --color-success: #10b981;
+  --color-success-bg: #ecfdf5;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fffbeb;
+  --color-error: #ef4444;
   --color-error-bg: #fef2f2;
 
   /* Typography */
-  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   /* Elevation & Shadows */
-  --shadow-sm: 0 1px 3px rgba(20, 35, 25, 0.05), 0 1px 2px rgba(20, 35, 25, 0.03);
-  --shadow-md: 0 4px 12px rgba(20, 35, 25, 0.07), 0 2px 4px rgba(20, 35, 25, 0.04);
-  --shadow-lg: 0 10px 25px rgba(20, 35, 25, 0.1), 0 4px 10px rgba(20, 35, 25, 0.05);
+  --shadow-sm: 0 2px 6px rgba(92, 84, 229, 0.04), 0 1px 3px rgba(30, 27, 75, 0.03);
+  --shadow-md: 0 8px 24px rgba(92, 84, 229, 0.08), 0 2px 6px rgba(30, 27, 75, 0.04);
+  --shadow-lg: 0 16px 36px rgba(92, 84, 229, 0.12), 0 4px 12px rgba(30, 27, 75, 0.06);
 
   /* Radii */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
   --radius-full: 9999px;
 
   /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-normal: 220ms ease;
+  --transition-fast: 160ms ease;
+  --transition-normal: 240ms ease;
 }
 
 /* Reset & Box Sizing */
@@ -92,7 +98,7 @@ body {
   min-height: 100vh;
 }
 
-/* Accessibility Focus States */
+/* Focus States */
 :focus-visible {
   outline: 3px solid var(--color-primary-600);
   outline-offset: 2px;
@@ -110,12 +116,12 @@ select:focus-visible {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   color: var(--text-main);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.25;
 }
 
-h1 { font-size: clamp(2rem, 4vw + 1rem, 2.75rem); }
-h2 { font-size: clamp(1.5rem, 2.5vw + 0.5rem, 2rem); }
+h1 { font-size: clamp(2.2rem, 4.5vw + 1rem, 3.2rem); letter-spacing: -0.025em; }
+h2 { font-size: clamp(1.6rem, 2.5vw + 0.5rem, 2.15rem); letter-spacing: -0.015em; }
 h3 { font-size: clamp(1.2rem, 1.5vw + 0.5rem, 1.45rem); }
 h4 { font-size: 1.15rem; }
 
@@ -135,7 +141,6 @@ a {
 
 a:hover {
   color: var(--color-primary-900);
-  text-decoration: underline;
 }
 
 button {
@@ -154,7 +159,7 @@ img, video {
 /* Container */
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1220px;
   margin: 0 auto;
   padding: 0 1.25rem;
 }

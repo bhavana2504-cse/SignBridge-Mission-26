@@ -10,6 +10,7 @@ import {
   HelpCircle,
   Sparkles
 } from '../common/Icons';
+import { AchievementBadgeItem } from '../common/Illustrations';
 import { VideoPlayer } from '../common/VideoPlayer';
 import { signService } from '../../services/signService';
 import { storageService } from '../../services/storageService';
@@ -26,15 +27,12 @@ export function QuizPage() {
 
   const categories = ['All', ...signService.getCategories()];
 
-  // Generate quiz questions
   const startQuiz = (selectedCat = 'All', questionCount = 8) => {
     let pool = signService.getSignsByCategory(selectedCat);
-    // Shuffle pool
     const shuffledPool = [...pool].sort(() => 0.5 - Math.random());
     const selectedSigns = shuffledPool.slice(0, Math.min(questionCount, shuffledPool.length));
 
     const generatedQuestions = selectedSigns.map((correctSign) => {
-      // Pick 3 distractors
       const distractors = signService.getRandomDistractors(3, correctSign.id);
       const allOptions = [correctSign, ...distractors].sort(() => 0.5 - Math.random());
 
@@ -42,9 +40,10 @@ export function QuizPage() {
         id: correctSign.id,
         correctSign,
         prompt: 'Which sign is demonstrated in the video?',
-        options: allOptions.map((item) => ({
+        options: allOptions.map((item, idx) => ({
           id: item.id,
           text: item.word,
+          numberPrefix: `${idx + 1}.`,
           isCorrect: item.id === correctSign.id
         }))
       };
@@ -94,8 +93,6 @@ export function QuizPage() {
       setSelectedAnswer(null);
       setIsAnswerSubmitted(false);
     } else {
-      // Quiz finished
-      const finalScore = score + (selectedAnswer?.isCorrect ? 0 : 0); // score already updated
       finishQuiz();
     }
   };
@@ -115,8 +112,11 @@ export function QuizPage() {
   return (
     <div className="container" style={{ paddingTop: '2rem' }}>
       <div className="section-header" style={{ textAlign: 'center' }}>
-        <span className="section-eyebrow">Interactive Assessment</span>
-        <h1 className="section-title">ISL Knowledge Quizzes</h1>
+        <span className="category-badge" style={{ marginBottom: '0.4rem' }}>
+          <span>🎯</span>
+          <span>Knowledge Check</span>
+        </span>
+        <h1 className="section-title">Test Your Skills</h1>
         <p className="section-subtitle" style={{ margin: '0 auto' }}>
           Test and solidify your sign comprehension with video-based multiple-choice challenges.
         </p>
@@ -126,8 +126,8 @@ export function QuizPage() {
         {/* State 1: Setup / Category Selection */}
         {quizState === 'setup' && (
           <div className="quiz-card">
-            <h2 style={{ fontSize: '1.35rem', marginBottom: '0.75rem', fontWeight: '700' }}>
-              Choose a Quiz Module
+            <h2 style={{ fontSize: '1.45rem', marginBottom: '0.75rem', fontWeight: '800', color: 'var(--text-main)' }}>
+              Choose a Quiz Challenge
             </h2>
             <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
               Select a specific vocabulary module or test yourself across all 40 signs.
@@ -145,20 +145,20 @@ export function QuizPage() {
                   >
                     <div>
                       <strong style={{ display: 'block', fontSize: '1.05rem', color: 'var(--color-primary-900)' }}>
-                        {cat === 'All' ? 'Full Curriculum Challenge' : `${cat} Quiz`}
+                        {cat === 'All' ? 'Full Curriculum Challenge' : `${cat} Challenge`}
                       </strong>
                       <span style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
                         {cat === 'All' ? '10 randomized video questions across all categories' : `${count} available signs`}
                       </span>
                     </div>
-                    <ArrowRight size={18} color="var(--color-primary-700)" />
+                    <ArrowRight size={18} color="var(--color-primary-600)" />
                   </button>
                 );
               })}
             </div>
 
             <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-md)', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              <strong>Notice:</strong> Multiple-choice quizzes test vocabulary recognition and comprehension of signs. They do not evaluate real physical signing hand posture or articulation.
+              <strong>Notice:</strong> Multiple-choice quizzes test visual sign recognition and comprehension. They do not evaluate real physical signing hand posture.
             </div>
           </div>
         )}
@@ -171,7 +171,7 @@ export function QuizPage() {
               <span className="category-badge">
                 {quizCategory === 'All' ? 'Comprehensive' : quizCategory}
               </span>
-              <span style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--color-primary-800)' }}>
+              <span style={{ fontWeight: '800', fontSize: '0.95rem', color: 'var(--color-primary-700)' }}>
                 Question {currentQIndex + 1} of {questions.length}
               </span>
             </div>
@@ -187,7 +187,7 @@ export function QuizPage() {
               loop={true}
             />
 
-            {/* Answer Options */}
+            {/* Numbered Answer Options (Matching Reference 1. Answer, 2. Answer...) */}
             <div className="quiz-options-grid" role="radiogroup" aria-label="Answer options">
               {currentQuestion.options.map((opt) => {
                 let btnClass = 'quiz-option-btn';
@@ -211,7 +211,12 @@ export function QuizPage() {
                     aria-checked={selectedAnswer?.id === opt.id}
                     role="radio"
                   >
-                    <span>{opt.text}</span>
+                    <span>
+                      <strong style={{ marginRight: '0.4rem', color: 'var(--color-primary-600)' }}>
+                        {opt.numberPrefix}
+                      </strong>
+                      {opt.text}
+                    </span>
                     {isAnswerSubmitted && opt.isCorrect && (
                       <CheckCircle2 size={18} color="var(--color-success)" />
                     )}
@@ -225,13 +230,13 @@ export function QuizPage() {
 
             {/* Submit / Feedback Bar */}
             {!isAnswerSubmitted ? (
-              <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+              <div style={{ marginTop: '1.75rem', display: 'flex', justifyContent: 'center' }}>
                 <button
                   type="button"
                   className="btn-primary"
+                  style={{ minWidth: '180px' }}
                   onClick={handleConfirmAnswer}
                   disabled={!selectedAnswer}
-                  style={{ opacity: selectedAnswer ? 1 : 0.5 }}
                 >
                   <span>Submit Answer</span>
                 </button>
@@ -239,7 +244,7 @@ export function QuizPage() {
             ) : (
               <div className={`quiz-feedback-box ${selectedAnswer?.isCorrect ? 'correct' : 'incorrect'}`}>
                 <div>
-                  <strong>{selectedAnswer?.isCorrect ? 'Correct! Excellent recall.' : 'Incorrect.'}</strong>
+                  <strong>{selectedAnswer?.isCorrect ? 'Correct! Outstanding recall.' : 'Not quite right.'}</strong>
                   <p style={{ fontSize: '0.9rem', marginTop: '0.25rem' }}>
                     This sign represents <strong>"{currentQuestion.correctSign.word}"</strong>: {currentQuestion.correctSign.description}
                   </p>
@@ -256,29 +261,37 @@ export function QuizPage() {
           </div>
         )}
 
-        {/* State 3: Completed Score Screen */}
+        {/* State 3: Completed Score Screen (Matching Reference Quiz Results) */}
         {quizState === 'completed' && (
           <div className="quiz-card quiz-score-summary" role="status" aria-label="Quiz results summary">
+            {/* Celebratory Shield Badge */}
+            <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+              <AchievementBadgeItem 
+                type={percentage >= 80 ? 'perfect' : percentage >= 50 ? 'champion' : 'first'} 
+                label={percentage >= 80 ? 'Perfect Score' : 'Module Completed'}
+              />
+            </div>
+
             <div className="quiz-score-circle">
               <span className="quiz-score-num">{percentage}%</span>
               <span className="quiz-score-label">{score} of {questions.length}</span>
             </div>
 
-            <h2 style={{ fontSize: '1.75rem', fontWeight: '800', marginBottom: '0.5rem' }}>
-              {percentage >= 80 ? 'Outstanding Performance!' : percentage >= 50 ? 'Good Effort!' : 'Keep Practicing!'}
+            <h2 style={{ fontSize: '1.85rem', fontWeight: '800', marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+              {percentage >= 80 ? 'Outstanding Performance!' : percentage >= 50 ? 'Great Progress!' : 'Keep Practicing!'}
             </h2>
-            <p style={{ color: 'var(--text-muted)', maxWidth: '420px', margin: '0 auto 1.75rem' }}>
-              You correctly identified {score} out of {questions.length} signs in the {quizCategory} module. Results have been saved to your learning progress.
+            <p style={{ color: 'var(--text-muted)', maxWidth: '440px', margin: '0 auto 1.75rem', fontSize: '0.95rem' }}>
+              You correctly identified {score} out of {questions.length} signs in the {quizCategory} challenge. Results have been saved to your progress dashboard.
             </p>
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.85rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 className="btn-primary"
                 onClick={() => startQuiz(quizCategory, questions.length)}
               >
                 <RotateCcw size={16} />
-                <span>Retry Quiz</span>
+                <span>Retry Challenge</span>
               </button>
 
               <button
