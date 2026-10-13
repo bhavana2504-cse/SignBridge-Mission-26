@@ -9,7 +9,6 @@
     "preview": "node node_modules/vite/bin/vite.js preview"
   },
   "dependencies": {
-    "@esbuild/win32-x64": "^0.28.2",
     "@supabase/supabase-js": "^2.117.3",
     "lucide-react": "^1.16.0",
     "react": "^19.0.0",
